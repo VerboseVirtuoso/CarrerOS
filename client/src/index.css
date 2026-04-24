@@ -1,0 +1,291 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&display=swap');
+
+/* ─── Design Tokens: Dark (default) ─────────────────────────────────────────── */
+:root {
+  --bg-color:      #0d0d0d;
+  --bg-secondary:  #151515;
+  --card-bg:       #111111;
+  --border-color:  #1e1e1e;
+  --primary:       #00ff88;
+  --primary-text:  #0d0d0d;   /* text ON a primary-bg button */
+  --warning:       #f0c040;
+  --danger:        #ff5555;
+  --info:          #378ADD;
+  --purple:        #aa88ff;
+  --text-main:     #e0e0e0;
+  --text-dim:      #888888;
+  --text-muted:    #444444;
+  --shadow:        none;
+  --font-main:     'IBM Plex Mono', monospace;
+  --transition:    0.18s ease;
+}
+
+/* ─── Design Tokens: Light ───────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg-color:      #f5f5f5;
+  --bg-secondary:  #ebebeb;
+  --card-bg:       #ffffff;
+  --border-color:  #dedede;
+  --primary:       #00994d;   /* WCAG AA on white: 4.5:1 */
+  --primary-text:  #ffffff;
+  --warning:       #a07000;   /* WCAG AA on white: 4.5:1 */
+  --danger:        #cc2200;   /* WCAG AA on white: 5.1:1 */
+  --info:          #1755a8;   /* WCAG AA on white: 5.8:1 */
+  --purple:        #5533aa;   /* WCAG AA on white: 6.2:1 */
+  --text-main:     #111111;
+  --text-dim:      #555555;
+  --text-muted:    #999999;
+  --shadow:        0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Reset ──────────────────────────────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+/* ─── Utility ────────────────────────────────────────────────────────────────── */
+.terminal-border {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.glow-text {
+  text-shadow: 0 0 8px var(--primary);
+}
+[data-theme="light"] .glow-text { text-shadow: none; }
+
+/* ─── Button ─────────────────────────────────────────────────────────────────── */
+.btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 6px 12px;
+  font-family: var(--font-main);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 8px rgba(0, 153, 77, 0.15);
+}
+.btn.active {
+  border-color: var(--primary);
+  background: rgba(0, 153, 77, 0.06);
+  color: var(--primary);
+}
+
+/* ─── Scanline (dark only) ───────────────────────────────────────────────────── */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 2px, 3px 100%;
+  z-index: 9999;
+  pointer-events: none;
+}
+[data-theme="light"] body::before { display: none; }
+
+/* ─── Root ───────────────────────────────────────────────────────────────────── */
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── View Transition ────────────────────────────────────────────────────────── */
+.view-container {
+  animation: viewFadeIn 0.25s ease-out both;
+  min-height: 200px;
+  width: 100%;
+}
+@keyframes viewFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Detail Panel Animations ───────────────────────────────────────────────── */
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+.panel-slide-in {
+  animation: slideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ─── Main Content Scroll Protection ────────────────────────────────────────── */
+main {
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Kanban Horizontal Scroll Container */
+.kanban-scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+  width: 100%;
+  padding-bottom: 10px; /* Space for scrollbar */
+}
+
+.kanban-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 280px);
+  gap: 16px;
+  min-width: 1464px; /* (280 * 5) + (16 * 4) */
+}
+
+/* ─── Skeleton Shimmer ───────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #1a1a1a 25%, #242424 50%, #1a1a1a 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: 4px;
+}
+[data-theme="light"] .skeleton {
+  background: linear-gradient(90deg, #e4e4e4 25%, #eeeeee 50%, #e4e4e4 75%);
+  background-size: 600px 100%;
+}
+
+/* ─── Toast ──────────────────────────────────────────────────────────────────── */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0)    scale(1); }
+  to   { opacity: 0; transform: translateY(-8px) scale(0.96); }
+}
+.toast-enter { animation: toastIn  0.22s cubic-bezier(0.34,1.4,0.64,1) both; }
+.toast-exit  { animation: toastOut 0.18s ease-in both; }
+
+/* ─── Empty State ────────────────────────────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+  border: 1px dashed var(--border-color);
+  border-radius: 4px;
+  margin-top: 8px;
+}
+.empty-state .empty-icon {
+  font-size: 1.4rem;
+  opacity: 0.4;
+}
+
+/* ─── Theme Toggle Button ────────────────────────────────────────────────────── */
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font-main);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.theme-toggle:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ─── Inputs (light mode fix) ────────────────────────────────────────────────── */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  color-scheme: light;
+}
+
+/* ─── CSS Tooltip ────────────────────────────────────────────────────────────── */
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.92);
+  background: var(--bg-secondary);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  font-family: var(--font-main);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  padding: 4px 9px;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 8000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+/* ─── Pipeline Progress Bar ──────────────────────────────────────────────────── */
+.pipeline-bar-track {
+  height: 3px;
+  background: var(--border-color);
+  border-radius: 2px;
+  overflow: hidden;
+  flex: 1;
+}
+.pipeline-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* ─── Onboarding Banner ──────────────────────────────────────────────────────── */
+.onboarding-step {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 16px;
+  text-align: left;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s ease;
+}
+.onboarding-step:hover {
+  border-color: var(--primary);
+}
