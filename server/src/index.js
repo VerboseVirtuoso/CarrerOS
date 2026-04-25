@@ -48,6 +48,11 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
+// ─── Preflight OPTIONS Handler ─────────────────────────────────────────────
+// Explicitly respond to all OPTIONS preflight requests before any other middleware.
+// This is required for POST, PUT, DELETE requests from browsers to pass CORS checks.
+app.options('*', cors());
+
 // ─── Body Parsing ──────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
