@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: job-tracker-api
+    name: careeros-server
     env: node
     plan: free
     rootDir: server
@@ -9,11 +9,7 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 5000
-      - key: MONGODB_URI
-        fromConfig: true
-      - key: JWT_SECRET
-        generateValue: true
-      - key: CLIENT_URL
-        fromConfig: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      # Set MONGODB_URI and JWT_SECRET in Render Dashboard > Environment
+      # Do NOT commit real credentials to this file
