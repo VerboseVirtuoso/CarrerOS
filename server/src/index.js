@@ -13,25 +13,39 @@ const isProduction = process.env.NODE_ENV === 'production';
 connectDB();
 
 // ─── CORS ─────────────────────────────────────────────────────────────────
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+const defaultOrigins = [
+  'http://localhost:5173',
+  'https://carrer-os-delta.vercel.app',
+  'https://carrer-os-delta.vercel.app/'
+];
+
+const envOrigins = (process.env.CLIENT_URL || '')
   .split(',')
-  .map(o => o.trim());
+  .map(o => o.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [...new Set([...defaultOrigins, ...envOrigins])];
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow curl / Postman / server-to-server requests (no Origin header)
     if (!origin) return callback(null, true);
     
-    // In production, strictly enforce allowedOrigins
-    if (isProduction) {
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error(`CORS blocked: Origin ${origin} is not authorized`));
+    // In production, check against allowedOrigins. In dev, allow all.
+    if (allowedOrigins.includes(origin) || !isProduction) {
+      callback(null, true);
+    } else {
+      console.warn(`[CORS] Blocked origin: ${origin}`);
+      // Don't pass an error to callback, just return false to let the middleware handle it
+      // This often results in a cleaner 403 response with headers
+      callback(null, false);
     }
-    
-    // In development, allow all origins
-    return callback(null, true);
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'x-migration-key'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  optionsSuccessStatus: 200
 }));
 
 // ─── Body Parsing ──────────────────────────────────────────────────────────
@@ -104,17 +118,26 @@ app.use((_req, res) => {
 });
 
 // ─── Global Error Handler ──────────────────────────────────────────────────
-app.use((err, _req, res, _next) => {
+app.use((err, req, res, _next) => {
   const statusCode = err.status || 500;
   
   if (!isProduction) {
     console.error('Unhandled server error:', err);
   }
 
+  // CRITICAL: Ensure CORS headers are present even on error responses
+  // Otherwise the browser will hide the real error behind a "CORS blocked" message
+  const origin = req.headers.origin;
+  if (origin && (allowedOrigins.includes(origin) || !isProduction)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Accept');
+  }
+
   res.status(statusCode).json({
     success: false,
     error: err.message || 'Internal server error',
-    // Suppress stack trace in production for security
     stack: isProduction ? undefined : err.stack,
   });
 });
