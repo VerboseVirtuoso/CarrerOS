@@ -35,8 +35,12 @@ api.interceptors.response.use(
   (response) => response,
 
   (error) => {
-    if (error.response?.status === 401) {
+    const requestUrl = error.config?.url || '';
+    const isAuthRequest = requestUrl.includes('/auth/login') || requestUrl.includes('/auth/register');
+
+    if (error.response?.status === 401 && !isAuthRequest) {
       // Token missing, expired, or invalid — clear storage and redirect to login
+      // Skip this for auth requests themselves (bad credentials should just show an error, not redirect)
       localStorage.removeItem('careeros-token');
       localStorage.removeItem('careeros-user');
 

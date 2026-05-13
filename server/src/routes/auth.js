@@ -37,11 +37,14 @@ router.post('/register', async (req, res) => {
       user: { id: user._id, email: user.email, createdAt: user.createdAt },
     }, 201);
   } catch (err) {
-    console.error('POST /auth/register error:', err.message);
+    console.error('POST /auth/register error:', err.message, err.stack);
     // Surface Mongoose validation errors cleanly
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map(e => e.message).join('; ');
       return fail(res, messages, 422);
+    }
+    if (err.name === 'MongoNetworkError' || err.name === 'MongooseServerSelectionError' || err.message?.includes('ECONNREFUSED') || err.message?.includes('connect')) {
+      return fail(res, 'Cannot reach database — please try again shortly', 503);
     }
     return fail(res, 'Registration failed', 500);
   }
@@ -77,8 +80,12 @@ router.post('/login', async (req, res) => {
       user: { id: user._id, email: user.email, createdAt: user.createdAt },
     });
   } catch (err) {
-    console.error('POST /auth/login error:', err.message);
-    return fail(res, 'Login failed', 500);
+    console.error('POST /auth/login error:', err.message, err.stack);
+    // Surface a more useful message based on the type of failure
+    if (err.name === 'MongoNetworkError' || err.name === 'MongooseServerSelectionError' || err.message?.includes('ECONNREFUSED') || err.message?.includes('connect')) {
+      return fail(res, 'Cannot reach database — please try again shortly', 503);
+    }
+    return fail(res, 'An unexpected error occurred during login', 500);
   }
 });
 

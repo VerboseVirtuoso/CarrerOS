@@ -186,6 +186,20 @@ const AnimatedMain = () => {
 
 const MainApp = () => {
   const [reminderCount, setReminderCount] = React.useState(0);
+  const location = useLocation();
+  const isLoggedIn = !!localStorage.getItem('careeros-token');
+  const isLoginPage = location.pathname === '/login';
+
+  // When not authenticated, render ONLY the login page — no StatsBar/TopBar/etc.
+  // This prevents unauthenticated GET /jobs requests that cause 401 → redirect loops.
+  if (isLoginPage || !isLoggedIn) {
+    return (
+      <div style={{ height: '100vh', width: '100vw', background: 'var(--bg-color)', color: 'var(--text-main)', fontFamily: 'var(--font-main)' }}>
+        <AnimatedMain />
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg-color)', color: 'var(--text-main)', fontFamily: 'var(--font-main)', overflow: 'hidden' }}>
       <TitleBar />
