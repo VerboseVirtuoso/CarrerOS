@@ -1,9 +1,5 @@
 const jwt = require('jsonwebtoken');
 
-/**
- * verifyToken — reads Authorization: Bearer <token>, verifies the JWT,
- * and stamps req.userId (string) for downstream route handlers.
- */
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -18,12 +14,8 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Set req.userId to the user ID stored in the token payload
-    // Our register/login routes use { id: user._id }
     req.userId = decoded.id;
-    req.user = decoded; // Store full payload if needed
-
+    req.user = decoded;
     next();
   } catch (err) {
     console.error('JWT verification failed:', err.message);

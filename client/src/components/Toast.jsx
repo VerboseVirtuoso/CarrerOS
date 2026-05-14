@@ -62,7 +62,6 @@ export const ToastProvider = ({ children }) => {
               <span style={{ color: c.text, fontWeight: 'bold', fontSize: '0.85rem', flexShrink: 0 }}>
                 [{c.icon}]
               </span>
-              {/* ✅ FIX: was {message} (undefined), now correctly {toast.message} */}
               <span>{toast.message}</span>
             </div>
           );

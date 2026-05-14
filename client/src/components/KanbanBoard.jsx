@@ -14,7 +14,6 @@ const COLUMNS = [
   { id: 'rejected',  label: 'REJECTED',  color: '#ff5555' },
 ];
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
 const SkeletonCard = () => (
   <div style={{
     background: 'var(--card-bg)', border: '1px solid var(--border-color)',
@@ -48,7 +47,6 @@ const KanbanSkeleton = () => (
   </div>
 );
 
-// ─── Empty Column ─────────────────────────────────────────────────────────────
 const EmptyColumn = ({ color, status, onAdd }) => (
   <div
     className="empty-state"
@@ -62,7 +60,6 @@ const EmptyColumn = ({ color, status, onAdd }) => (
   </div>
 );
 
-// ─── Welcome Banner ───────────────────────────────────────────────────────────
 const QUICK_STEPS = [
   { n: '01', title: 'Add Job', desc: 'Click [ + ADD JOB ] or use the command bar to log your first application.' },
   { n: '02', title: 'Track', desc: 'Drag cards as you move from Screening to Interviews and Offers.' },
@@ -123,7 +120,6 @@ const WelcomeBanner = ({ onAdd }) => (
   </div>
 );
 
-// ─── Main Board ───────────────────────────────────────────────────────────────
 const KanbanBoard = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();

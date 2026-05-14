@@ -6,7 +6,6 @@ const JobCard = ({ job, index, accentColor }) => {
   const { _id, company, role, appliedAt, lastActivityAt, status, source } = job;
   const openPanel = useAppStore(state => state.openPanel);
 
-  // Calculate days since activity
   const baseDate = lastActivityAt || appliedAt;
   const daysSilent = baseDate
     ? Math.floor((Date.now() - new Date(baseDate).getTime()) / 86_400_000)

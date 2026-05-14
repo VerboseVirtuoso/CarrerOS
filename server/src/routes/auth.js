@@ -3,24 +3,15 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 const ok   = (res, data, code = 200) => res.status(code).json({ success: true, data });
 const fail = (res, message, code = 400) => res.status(code).json({ success: false, error: message });
 
-// ─── POST /api/auth/register ───────────────────────────────────────────────
-/**
- * @route   POST /api/auth/register
- * @desc    Create a new account; returns JWT + user object
- * @body    { email, password }
- * @access  Public
- */
 router.post('/register', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) return fail(res, 'email and password are required', 422);
 
   try {
-    // Reject duplicates
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) return fail(res, 'An account with that email already exists', 409);
 
@@ -38,7 +29,6 @@ router.post('/register', async (req, res) => {
     }, 201);
   } catch (err) {
     console.error('POST /auth/register error:', err.message, err.stack);
-    // Surface Mongoose validation errors cleanly
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map(e => e.message).join('; ');
       return fail(res, messages, 422);
@@ -50,13 +40,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// ─── POST /api/auth/login ──────────────────────────────────────────────────
-/**
- * @route   POST /api/auth/login
- * @desc    Verify credentials; returns JWT + user object
- * @body    { email, password }
- * @access  Public
- */
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -81,7 +64,6 @@ router.post('/login', async (req, res) => {
     });
   } catch (err) {
     console.error('POST /auth/login error:', err.message, err.stack);
-    // Surface a more useful message based on the type of failure
     if (err.name === 'MongoNetworkError' || err.name === 'MongooseServerSelectionError' || err.message?.includes('ECONNREFUSED') || err.message?.includes('connect')) {
       return fail(res, 'Cannot reach database — please try again shortly', 503);
     }

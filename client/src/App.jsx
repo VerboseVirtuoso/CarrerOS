@@ -19,7 +19,6 @@ const queryClient = new QueryClient({
 });
 
 
-
 const TitleBar = () => {
   const { theme, toggleTheme } = useTheme();
   return (
@@ -190,8 +189,6 @@ const MainApp = () => {
   const isLoggedIn = !!localStorage.getItem('careeros-token');
   const isLoginPage = location.pathname === '/login';
 
-  // When not authenticated, render ONLY the login page — no StatsBar/TopBar/etc.
-  // This prevents unauthenticated GET /jobs requests that cause 401 → redirect loops.
   if (isLoginPage || !isLoggedIn) {
     return (
       <div style={{ height: '100vh', width: '100vw', background: 'var(--bg-color)', color: 'var(--text-main)', fontFamily: 'var(--font-main)' }}>
