@@ -39,12 +39,16 @@ const connectDB = async () => {
   const options = {
     // Retry writes on transient errors
     retryWrites: true,
-    // Keep alive to prevent idle-timeout disconnections
-    serverSelectionTimeoutMS: 10_000,   // 10 s to find a server
-    socketTimeoutMS: 45_000,            // 45 s on socket idle
-    // Connection pool
+    // How long to wait finding a server before erroring
+    serverSelectionTimeoutMS: 10_000,   // 10 s
+    // Keepalive ping — tells Atlas "still here" every 10s to prevent idle drops
+    heartbeatFrequencyMS: 10_000,       // 10 s
+    // Give sockets 90s before timing out (Atlas free tier drops ~60s idle)
+    socketTimeoutMS: 90_000,
+    // Connection pool — minPoolSize 0 means don't force idle connections open
+    // (avoids Atlas killing forced-open connections and triggering reconnect loops)
     maxPoolSize: 10,
-    minPoolSize: 2,
+    minPoolSize: 0,
   };
 
   try {
