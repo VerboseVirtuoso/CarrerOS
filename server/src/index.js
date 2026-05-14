@@ -1,3 +1,8 @@
+// ─── DNS Fix ───────────────────────────────────────────────────────────────────
+// Node.js libuv DNS resolver fails on some networks (querySrv ECONNREFUSED)
+// because the system DNS at 127.0.0.1:53 is blocked. Force Google Public DNS.
+require('dns').setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
+
 require('dotenv').config();
 const express    = require('express');
 const cors       = require('cors');
